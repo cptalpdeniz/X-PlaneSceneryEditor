@@ -1,1 +1,1 @@
-# XPlaneSceneryEditor
+# X-PlaneSceneryEditor
