@@ -1,15 +1,15 @@
 ﻿namespace XPlane_Scenery_Editor
 {
-    public class sceneryArea
+    public class SceneryArea
     {
         //improvements here suchs as library required, which one etc.
-        private int index { get; set; }
-        private bool enabled { get; set; }
-        private string name { get; set; }
-        private string path { get; set; }
-        private bool hasError { get; set; }
+        internal int index { get; set; }
+        internal bool enabled { get; set; }
+        internal string name { get; set; }
+        internal string path { get; set; }
+        internal bool hasError { get; set; }
 
-        public sceneryArea(int index, bool enabled, string name, string path, bool hasError)
+        public SceneryArea(int index, bool enabled, string name, string path, bool hasError)
         {
             this.index = index;
             this.enabled = enabled;

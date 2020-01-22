@@ -18,10 +18,10 @@ namespace XPlane_Scenery_Editor
             Application.SetCompatibleTextRenderingDefault(false);
             if (Settings.Default.FirstRun)
             {
-                Welcome.ShowSplashScreen();
+                Welcome.showSplashScreen();
                 Thread.Sleep(4500);
                 Welcome.ShowFirstRunBox();
-                Welcome.CloseForm();
+                Welcome.closeForm();
                 
             }
             if (closefromInternal)

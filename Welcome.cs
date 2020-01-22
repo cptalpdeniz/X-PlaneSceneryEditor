@@ -103,24 +103,24 @@ namespace XPlane_Scenery_Editor
             label1.Refresh();
         }
 
-        static private void ShowForm()
+        static private void showForm()
         {
             welcomeSplash = new Welcome();
             Application.Run(welcomeSplash);
         }
 
-        static public void ShowSplashScreen()
+        static public void showSplashScreen()
         {
             // Need to make sure it is only launched once
             if (welcomeSplash != null)
                 return;
-            Thread thread = new Thread(new ThreadStart(ShowForm));
+            Thread thread = new Thread(new ThreadStart(showForm));
             thread.IsBackground = true;
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
         }
 
-        static public void CloseForm()
+        static public void closeForm()
         {
             welcomeSplash.Invoke(new CloseDelegate(Welcome.CloseFormInternal));
         }
