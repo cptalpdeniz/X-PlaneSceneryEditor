@@ -10,7 +10,6 @@ namespace XPlane_Scenery_Editor
 {
     public partial class Forms : Form
     {
-        //From XPlane website
         //You can change a line from SCENERY_PACK to SCENERY_PACK_DISABLED to disable the loading of a pack entirely.
         private string fileName;
         private OpenFileDialog openFileDialog;
@@ -293,6 +292,14 @@ namespace XPlane_Scenery_Editor
             else
             {
                 MessageBox.Show("Please select config file first.", "Missing File", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void mainListView_Layout(object sender, LayoutEventArgs e)
+        {
+            foreach (var scenery in sceneryList)
+            {
+                var row = new string[] { scenery.index.ToString(),  }
             }
         }
     }
