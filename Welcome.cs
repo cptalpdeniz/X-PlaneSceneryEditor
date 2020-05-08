@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -59,12 +58,12 @@ namespace XPlane_Scenery_Editor
             if (File.Exists(xplaneLocationFile))
             {
                 var xplaneLocation = File.ReadAllText(xplaneLocationFile);
-                xplaneLocation = Regex.Replace(xplaneLocation, @"\t|\n|\r", "");
+                xplaneLocation = Regex.Replace(xplaneLocation, @"\t|\n|\r", "").Replace('/', '\\');
                 var sceneryPacksFile = Path.Combine(xplaneLocation, @"Custom Scenery\scenery_packs.ini");
                 if (File.Exists(sceneryPacksFile))
                 {
                     Properties.Settings.Default.sceneryINILocation = sceneryPacksFile;
-                    Properties.Settings.Default.xpLocation = xplaneLocationFile;
+                    Properties.Settings.Default.xpLocation = xplaneLocation;
                     MessageBox.Show("scenery_packs.ini file has been found.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 }
                 else

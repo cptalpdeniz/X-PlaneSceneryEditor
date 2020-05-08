@@ -19,7 +19,7 @@ namespace XPlane_Scenery_Editor
             if (Settings.Default.FirstRun)
             {
                 Welcome.showSplashScreen();
-                Thread.Sleep(4500);
+                Thread.Sleep(3500);
                 Welcome.ShowFirstRunBox();
                 Welcome.closeForm();
                 

@@ -5,6 +5,8 @@ using XPlane_Scenery_Editor.Properties;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace XPlane_Scenery_Editor
 {
@@ -29,7 +31,7 @@ namespace XPlane_Scenery_Editor
             return false;
         }
 
-        public static bool CheckInternetConnection()
+        public static bool checkInternetConnection()
         {
             try
             {
@@ -45,13 +47,57 @@ namespace XPlane_Scenery_Editor
             }
         }
 
+        //run dsf tool to convert to txt.
+        //read all lines that start with OBJECT_DEF and ! (lib && objects)
+        //take the first folder of the path (misterX/...) only the misterX and add it to the array
+        //array of libraries required
+        private List<string> readLibraryRequirements(string sceneryPath)
+        {
+            string DSF_EXE_LOC = AppDomain.CurrentDomain.BaseDirectory + @"DSFTool.exe";
+            List<string> libraryList = new List<String>();
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(Settings.Default.xpLocation + sceneryPath + @"earth nav data", "*", SearchOption.AllDirectories)
+                                    .Where(s => s.EndsWith(".dsf", StringComparison.OrdinalIgnoreCase)))
+                {
+                    //ProcessStartInfo startInfo = new ProcessStartInfo("cmd.exe", @"\c" + DSF_EXE_LOC + "--dsf2text " + file + " " + file + ".txt")
+                    ProcessStartInfo startInfo = new ProcessStartInfo(DSF_EXE_LOC, "--dsf2text " + file + " " + file + ".txt")
+                    {
+                        CreateNoWindow = false,
+                        UseShellExecute = false,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                    };
+
+                    using (Process dsfTool = Process.Start(startInfo))
+                    {
+                        dsfTool.WaitForExit();
+                    }
+                    string[] libTXT = File.ReadAllLines(file + ".txt");
+                    foreach (string line in libTXT)
+                    {
+                        if (line.Contains("OBJECT_DEF ") && !(line.ToLower().Contains("lib") || line.ToLower().Contains("objects")))
+                        {
+                            string s = line.Split(' ', '/')[1];
+                            libraryList.Add(Regex.Replace(s, @"(^\w)|(\s\w)", m => m.Value.ToUpper()));
+                        }
+                    }
+            }
+            }
+            catch (Exception e)
+            {
+                LogController.Write(e.ToString());
+            }
+            
+            return libraryList;
+        }
+
         //after List<SceneryArea> is initialized, need to draw the listView
         private void initSceneryList()
         {
             File.SetAttributes(Settings.Default.sceneryINILocation, FileAttributes.Normal);
             sceneryList = new List<SceneryArea>();
 
-            var t_fileArray = File.ReadAllLines(fileName);
+            string[] t_fileArray = File.ReadAllLines(fileName);
 
             int count = 0;
             for (count = 0; count < t_fileArray.Length; count++)
@@ -70,12 +116,13 @@ namespace XPlane_Scenery_Editor
                     tempArr = t_fileArray[i].Split(new[] { ' ' }, 2);
                 else
                 {
-                    MessageBox.Show("An error occured, please regenerate your scenery config file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("An error occured, please regenerate your scenery config file by launching your simulator", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Application.Exit();
                 }
                 var isEnabled = (tempArr[0] == "SCENERY_PACK") ? true : false;
-                var name = tempArr[1].Substring(tempArr[1].IndexOf('\\') + 1);
-                sceneryList.Add(new SceneryArea(i, isEnabled, name, tempArr[1], false)); //tempArr[1] represents the path
+                string name = tempArr[1].Substring(tempArr[1].IndexOf('\\') + 1);
+                string path = tempArr[1].Replace('/', '\\');
+                sceneryList.Add(new SceneryArea(i, isEnabled, name, path, false, readLibraryRequirements(path))); //tempArr[1] represents the path
             }
         }
 
@@ -196,7 +243,7 @@ namespace XPlane_Scenery_Editor
             Cursor.Current = Cursors.WaitCursor;
             string currentVersion = "0.0.0.0";
             var error = false;
-            if (CheckInternetConnection())
+            if (checkInternetConnection())
             {
                 var client = new WebClient();
                 string currentVersionURL = "https://raw.githubusercontent.com/cptalpdeniz/X-PlaneSceneryEditor/master/version.md";
@@ -299,7 +346,7 @@ namespace XPlane_Scenery_Editor
         {
             foreach (var scenery in sceneryList)
             {
-                var row = new string[] { scenery.index.ToString(),  }
+                //var row = new string[] { scenery.index.ToString(), };
             }
         }
     }
